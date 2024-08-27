@@ -11,11 +11,11 @@ import com.intellij.openapi.project.Project;
  * HttpMethodFilterConfiguration
  * @author WQ
  */
-@State(name = "MethodFilterConfiguration", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
-public class MethodFilterConfiguration extends ChooseByNameFilterConfiguration<HttpMethod> {
+@State(name = "CustomMethodFilterConfiguration", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
+public class CustomMethodFilterConfiguration extends ChooseByNameFilterConfiguration<HttpMethod> {
 
-    public static MethodFilterConfiguration getInstance(Project project) {
-        return project.getService(MethodFilterConfiguration.class);
+    public static CustomMethodFilterConfiguration getInstance(Project project) {
+        return project.getService(CustomMethodFilterConfiguration.class);
     }
 
     @Override

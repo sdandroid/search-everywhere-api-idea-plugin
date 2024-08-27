@@ -11,10 +11,7 @@ import cn.gudqs7.plugins.common.util.jetbrain.DialogUtil;
 import cn.gudqs7.plugins.common.util.jetbrain.ExceptionUtil;
 import cn.gudqs7.plugins.common.util.jetbrain.IdeaApplicationUtil;
 import cn.gudqs7.plugins.common.util.structure.PackageInfoUtil;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -35,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author wq
  */
-public abstract class AbstractBatchDocerSavior extends AbstractAction implements UpdateInBackground {
+public abstract class AbstractBatchDocerSavior extends AbstractAction implements ActionUpdateThreadAware {
 
     @Override
     public void update0(@NotNull AnActionEvent e) {

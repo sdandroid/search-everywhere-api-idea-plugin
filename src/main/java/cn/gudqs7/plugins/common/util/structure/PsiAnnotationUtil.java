@@ -4,7 +4,6 @@ import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
-import com.intellij.psi.PsiReferenceExpression;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
@@ -125,18 +124,19 @@ public class PsiAnnotationUtil {
     }
 
     private static Object getValueByPsiAnnotationMemberValue(PsiAnnotationMemberValue value) {
-        if (value instanceof PsiReferenceExpression) {
-            PsiReferenceExpression psiReferenceExpression = (PsiReferenceExpression) value;
-            String text = psiReferenceExpression.getText();
-            String prefixWithRequestMethod = "RequestMethod.";
-            if (text.startsWith(prefixWithRequestMethod)) {
-                return text.substring(prefixWithRequestMethod.length());
-            } else {
-                return text;
-            }
-        } else {
-            return computeConstantExpression(value);
-        }
+        return computeConstantExpression(value);
+//        if (value instanceof PsiReferenceExpression) {
+//            PsiReferenceExpression psiReferenceExpression = (PsiReferenceExpression) value;
+//            String text = psiReferenceExpression.getText();
+//            String prefixWithRequestMethod = "RequestMethod.";
+//            if (text.startsWith(prefixWithRequestMethod)) {
+//                return text.substring(prefixWithRequestMethod.length());
+//            } else {
+//                return text;
+//            }
+//        } else {
+//            return computeConstantExpression(value);
+//        }
     }
 
     private static Object computeConstantExpression(PsiAnnotationMemberValue psiAnnotationMemberValue) {

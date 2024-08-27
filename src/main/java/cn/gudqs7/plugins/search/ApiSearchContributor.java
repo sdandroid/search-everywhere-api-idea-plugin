@@ -13,6 +13,7 @@ import com.intellij.ide.actions.searcheverywhere.SearchEverywhereManager;
 import com.intellij.ide.actions.searcheverywhere.WeightedSearchEverywhereContributor;
 import com.intellij.ide.util.ElementsChooser;
 import com.intellij.idea.ActionsBundle;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -53,10 +54,10 @@ public class ApiSearchContributor implements WeightedSearchEverywhereContributor
     public ApiSearchContributor(@NotNull AnActionEvent event) {
         this.actionEvent = event;
         myProject = event.getRequiredData(CommonDataKeys.PROJECT);
-        MethodFilterConfiguration methodFilterConfiguration = MethodFilterConfiguration.getInstance(myProject);
-        if (methodFilterConfiguration != null) {
+        CustomMethodFilterConfiguration customMethodFilterConfiguration = CustomMethodFilterConfiguration.getInstance(myProject);
+        if (customMethodFilterConfiguration != null) {
             myFilter = new PersistentSearchEverywhereContributorFilter<>(
-                    Arrays.asList(HttpMethod.values()), methodFilterConfiguration,
+                    Arrays.asList(HttpMethod.values()), customMethodFilterConfiguration,
                     Enum::name, httpMethod -> null
             );
         }
@@ -230,6 +231,11 @@ public class ApiSearchContributor implements WeightedSearchEverywhereContributor
 
     static class FiltersAction extends ShowFilterAction {
 
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
         final PersistentSearchEverywhereContributorFilter<?> filter;
         final Runnable rebuildRunnable;
 
@@ -252,6 +258,8 @@ public class ApiSearchContributor implements WeightedSearchEverywhereContributor
         protected ElementsChooser<?> createChooser() {
             return createChooser(filter, rebuildRunnable);
         }
+
+
 
         private static <T> ElementsChooser<T> createChooser(@NotNull PersistentSearchEverywhereContributorFilter<T> filter, @NotNull Runnable rebuildRunnable) {
             ElementsChooser<T> res = new ElementsChooser<T>(filter.getAllElements(), false) {
