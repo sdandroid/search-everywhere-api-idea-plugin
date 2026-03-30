@@ -11,10 +11,7 @@ import cn.gudqs7.plugins.common.util.jetbrain.DialogUtil;
 import cn.gudqs7.plugins.common.util.jetbrain.ExceptionUtil;
 import cn.gudqs7.plugins.common.util.jetbrain.IdeaApplicationUtil;
 import cn.gudqs7.plugins.common.util.structure.PackageInfoUtil;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -35,7 +32,12 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author wq
  */
-public abstract class AbstractBatchDocerSavior extends AbstractAction implements UpdateInBackground {
+public abstract class AbstractBatchDocerSavior extends AbstractAction {
+
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 
     @Override
     public void update0(@NotNull AnActionEvent e) {
@@ -52,8 +54,8 @@ public abstract class AbstractBatchDocerSavior extends AbstractAction implements
         if (virtualFile != null) {
             initConfig(e, project, psiElement, virtualFile);
         }
-        boolean update0 = isNotShow(e, project, psiElement, psiClass, psiDirectory);
-        if (update0) {
+        boolean notShow = isNotShow(e, project, psiElement, psiClass, psiDirectory);
+        if (notShow) {
             notVisible(e);
             return;
         }
@@ -69,10 +71,9 @@ public abstract class AbstractBatchDocerSavior extends AbstractAction implements
             return;
         }
 
-        Object data = e.getDataContext().getData("psi.Element.array");
-        if (data instanceof PsiElement[]) {
-            PsiElement[] psiElements = (PsiElement[]) data;
-            if (psiElements.length > 1) {
+        PsiElement[] psiElementsArray = e.getData(PlatformDataKeys.PSI_ELEMENT_ARRAY);
+        if (psiElementsArray != null) {
+            if (psiElementsArray.length > 1) {
                 return;
             }
         }
@@ -93,11 +94,16 @@ public abstract class AbstractBatchDocerSavior extends AbstractAction implements
                 (o1, o2) -> {
                     String qName1 = o1.getQualifiedName();
                     String qName2 = o2.getQualifiedName();
-                    if (Objects.equals(qName1, qName2) || qName1 == null || qName2 == null) {
+                    if (qName1 == null && qName2 == null) {
                         return 0;
-                    } else {
-                        return qName1.compareTo(qName2);
                     }
+                    if (qName1 == null) {
+                        return -1;
+                    }
+                    if (qName2 == null) {
+                        return 1;
+                    }
+                    return qName1.compareTo(qName2);
                 }
         );
 
@@ -182,6 +188,7 @@ public abstract class AbstractBatchDocerSavior extends AbstractAction implements
                     } catch (ProcessCanceledException canceledException) {
                         hasCancelAtomic.set(true);
                         handleCancelTask(docRootDirPath, projectFilePath);
+                        throw canceledException;
                     } catch (Throwable e1) {
                         // 此处 catch 需保留, 因为不会这里抛出异常, 不会到外面的 catch
                         hasCancelAtomic.set(true);
@@ -227,11 +234,10 @@ public abstract class AbstractBatchDocerSavior extends AbstractAction implements
         if (isFromArray) {
             return null;
         }
-        Object data = e.getDataContext().getData("psi.Element.array");
-        if (data instanceof PsiElement[]) {
-            PsiElement[] psiElements = (PsiElement[]) data;
-            if (psiElements.length > 1) {
-                PsiElement psiElement0 = psiElements[0];
+        PsiElement[] psiElementsArray = e.getData(PlatformDataKeys.PSI_ELEMENT_ARRAY);
+        if (psiElementsArray != null) {
+            if (psiElementsArray.length > 1) {
+                PsiElement psiElement0 = psiElementsArray[0];
                 return getFirstPsiFile(e, project, psiElement0, true);
             }
         }
@@ -244,11 +250,10 @@ public abstract class AbstractBatchDocerSavior extends AbstractAction implements
             handlePsiDirectory(psiDirectory, psiClassList);
         }
 
-        Object data = e.getDataContext().getData("psi.Element.array");
-        if (data instanceof PsiElement[]) {
-            PsiElement[] psiElements = (PsiElement[]) data;
-            if (psiElements.length > 0) {
-                for (PsiElement element : psiElements) {
+        PsiElement[] psiElementsArray = e.getData(PlatformDataKeys.PSI_ELEMENT_ARRAY);
+        if (psiElementsArray != null) {
+            if (psiElementsArray.length > 0) {
+                for (PsiElement element : psiElementsArray) {
                     if (element instanceof PsiDirectory) {
                         PsiDirectory directory = (PsiDirectory) element;
                         handlePsiDirectory(directory, psiClassList);
