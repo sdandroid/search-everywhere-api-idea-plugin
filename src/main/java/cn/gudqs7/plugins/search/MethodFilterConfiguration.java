@@ -11,7 +11,7 @@ import com.intellij.openapi.project.Project;
  * HttpMethodFilterConfiguration
  * @author WQ
  */
-@State(name = "MethodFilterConfiguration", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
+@State(name = "SearchEverywhereApi.MethodFilterConfiguration", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 public class MethodFilterConfiguration extends ChooseByNameFilterConfiguration<HttpMethod> {
 
     public static MethodFilterConfiguration getInstance(Project project) {
