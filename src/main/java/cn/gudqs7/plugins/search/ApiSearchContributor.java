@@ -52,7 +52,7 @@ public class ApiSearchContributor implements WeightedSearchEverywhereContributor
 
     public ApiSearchContributor(@NotNull AnActionEvent event) {
         this.actionEvent = event;
-        myProject = event.getRequiredData(CommonDataKeys.PROJECT);
+        myProject = event.getData(CommonDataKeys.PROJECT);
         MethodFilterConfiguration methodFilterConfiguration = MethodFilterConfiguration.getInstance(myProject);
         if (methodFilterConfiguration != null) {
             myFilter = new PersistentSearchEverywhereContributorFilter<>(
